@@ -8,12 +8,14 @@ const authentication = function(req, res, next){
 
         if (!token) return res.status(401).send({ status: false, msg: "token must be present" });
 
-        let decodedToken= jwt.verify(token, "Hera-pheri");
-        if (!decodedToken) return res.status(401).send({ status: false, msg: "token is invalid" });
-        
-        req.headers["authorId"] = decodedToken.authorId
+        jwt.verify(token, "Hera-pheri", (err, author) => {
 
-        next()
+            if (err)
+              return res.status(401).json({ status: false, message: "Token is not valid!" });
+      
+              req.headers["authorId"] = author.authorId
+            next();
+        });
     } catch (error) {
         console.log(error);
         res.status(500).send({ err : error.message });
